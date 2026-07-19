@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Company {
+  companyCode Int      @id @map("company_code")
+  companyName String   @map("company_name")
+  locations   Location[]
+  assets      Asset[]
+
+  @@map("company")
+}
+
+model Location {
+  locationId   Int      @id @default(autoincrement()) @map("location_id")
+  companyCode  Int      @map("company_code")
+  locationCode String   @map("location_code")
+  locationName String?  @map("location_name")
+
+  company Company @relation(fields: [companyCode], references: [companyCode])
+  assets  Asset[]
+
+  @@unique([companyCode, locationCode])
+  @@map("location")
+}
+
+model AssetClass {
+  assetClassCode Int     @id @map("asset_class_code")
+  description    String
+  assets         Asset[]
+
+  @@map("asset_class")
+}
+
+model Vendor {
+  vendorCode Int     @id @map("vendor_code")
+  vendorName String  @map("vendor_name")
+  assets     Asset[]
+
+  @@map("vendor")
+}
+
+model AppUser {
+  userId     Int      @id @default(autoincrement()) @map("user_id")
+  fullName   String   @map("full_name")
+  email      String?  @unique
+  role       String   @default("staff")
+  department String?
+  isPerson   Boolean  @default(true) @map("is_person")
+
+  assignments             AssetAssignment[]
+  createdAssets           Asset[]           @relation("AssetCreatedBy")
+  updatedAssets           Asset[]           @relation("AssetUpdatedBy")
+  createdAssignments      AssetAssignment[] @relation("AssignmentCreatedBy")
+  auditLogs               AuditLog[]
+
+  @@map("app_user")
+}
+
+model Asset {
+  assetId          Int       @id @default(autoincrement()) @map("asset_id")
+  companyCode      Int       @map("company_code")
+  assetNumber      String    @map("asset_number")
+  assetClassCode   Int?      @map("asset_class_code")
+  locationId       Int?      @map("location_id")
+  vendorCode       Int?      @map("vendor_code")
+  description      String?
+  serialNumber     String?   @map("serial_number")
+  localReference   String?   @map("local_reference")
+  capitalizedOn    DateTime? @map("capitalized_on") @db.Date
+  acquisitionYear  Int?      @map("acquisition_year")
+  apcValue         Decimal?  @map("apc_value") @db.Decimal(14, 2)
+  bookValue        Decimal?  @map("book_value") @db.Decimal(14, 2)
+  currency         String    @default("INR")
+  uom              String?
+  quantity         Decimal   @default(1) @db.Decimal(10, 2)
+  remarks          String?
+  otherRemarks     String?   @map("other_remarks")
+  warrantyExpiresOn DateTime? @map("warranty_expires_on") @db.Date
+
+  createdBy       Int        @map("created_by")
+  updatedBy       Int?       @map("updated_by")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+  deletedAt       DateTime?  @map("deleted_at")
+
+  company     Company     @relation(fields: [companyCode], references: [companyCode])
+  location    Location?   @relation(fields: [locationId], references: [locationId])
+  assetClass  AssetClass? @relation(fields: [assetClassCode], references: [assetClassCode])
+  vendor      Vendor?     @relation(fields: [vendorCode], references: [vendorCode])
+  creator     AppUser     @relation("AssetCreatedBy", fields: [createdBy], references: [userId])
+  updater     AppUser?    @relation("AssetUpdatedBy", fields: [updatedBy], references: [userId])
+  assignments AssetAssignment[]
+
+  @@unique([companyCode, assetNumber])
+  @@map("asset")
+}
+
+model AssetAssignment {
+  assignmentId Int       @id @default(autoincrement()) @map("assignment_id")
+  assetId      Int       @map("asset_id")
+  userId       Int       @map("user_id")
+  assignedOn   DateTime  @default(now()) @map("assigned_on") @db.Date
+  returnedOn   DateTime? @map("returned_on") @db.Date
+  remarks      String?
+  createdBy    Int       @map("created_by")
+
+  asset    Asset   @relation(fields: [assetId], references: [assetId])
+  user     AppUser @relation(fields: [userId], references: [userId])
+  creator  AppUser @relation("AssignmentCreatedBy", fields: [createdBy], references: [userId])
+
+  @@map("asset_assignment")
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  tableName String   @map("table_name")
+  recordId  Int      @map("record_id")
+  action    String
+  changedBy Int      @map("changed_by")
+  changedAt DateTime @default(now()) @map("changed_at")
+  changes   Json?
+
+  changer AppUser @relation(fields: [changedBy], references: [userId])
+
+  @@map("audit_log")
+}

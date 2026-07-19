@@ -1,0 +1,4 @@
+.vscode
+.env
+AssetsDB/.env
+AssetsDB/node_modules
