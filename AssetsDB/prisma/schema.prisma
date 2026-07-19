@@ -48,6 +48,7 @@ model AppUser {
   userId     Int      @id @default(autoincrement()) @map("user_id")
   fullName   String   @map("full_name")
   email      String?  @unique
+  password   String?
   role       String   @default("staff")
   department String?
   isPerson   Boolean  @default(true) @map("is_person")
