@@ -24,7 +24,7 @@ export default function AssignmentsList() {
     p.set("page", String(page)); p.set("limit", String(limit));
     try {
       const r = await api<{ data: any[]; total: number }>(`/api/assignments?${p}`);
-      setRows(r.data); setTotal(r.total || r.data.length);
+      setRows(r.data || []); setTotal(r.total || r.data?.length || 0);
     } catch (e: any) { push("error", e.message); }
     finally { setLoading(false); }
   };

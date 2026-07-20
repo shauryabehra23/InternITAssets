@@ -50,7 +50,7 @@ export default function AssetsList() {
     params.set("limit", String(limit));
     try {
       const r = await api<{ data: any[]; total: number }>(`/api/assets?${params}`);
-      setRows(r.data); setTotal(r.total);
+      setRows(r.data || []); setTotal(r.total);
     } catch (e: any) { push("error", e.message); }
     finally { setLoading(false); }
   };

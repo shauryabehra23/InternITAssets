@@ -28,8 +28,8 @@ export default function AssetDetail() {
   const load = async () => {
     const [a, h, au] = await Promise.all([
       api<any>(`/api/assets/${id}`),
-      api<{ data: any[] }>(`/api/assignments?assetId=${id}`).then((r) => r.data).catch(() => []),
-      api<{ data: any[] }>(`/api/assets/${id}/audit-log`).then((r) => r.data).catch(() => []),
+      api<{ data: any[] }>(`/api/assignments?assetId=${id}`).then((r) => r.data || []).catch(() => []),
+      api<{ data: any[] }>(`/api/assets/${id}/audit-log`).then((r) => r.data || []).catch(() => []),
     ]);
     setAsset(a); setHistory(h); setAudit(au);
   };

@@ -24,7 +24,7 @@ export default function UsersList() {
     setLoading(true);
     try {
       const r = await api<{ data: any[]; total: number }>(`/api/users?page=${page}&limit=${limit}`);
-      setRows(r.data); setTotal(r.total || r.data.length);
+      setRows(r.data || []); setTotal(r.total || r.data?.length || 0);
     } catch (e: any) { push("error", e.message); }
     finally { setLoading(false); }
   };
