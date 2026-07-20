@@ -58,6 +58,7 @@ export function AssetForm({ initial, mode, assetId }: { initial?: any; mode: "cr
     if (body.quantity !== undefined) body.quantity = Number(body.quantity);
     for (const k of ["apcValue", "bookValue"]) if (body[k] !== undefined) body[k] = Number(body[k]);
     if (body.acquisitionYear !== undefined) body.acquisitionYear = Number(body.acquisitionYear);
+    for (const k of ["companyCode", "vendorCode", "locationId", "assetClassCode"]) if (body[k] !== undefined) body[k] = Number(body[k]);
     try {
       if (mode === "create") {
         const created = await api<any>("/api/assets", { method: "POST", body: JSON.stringify(body) });
