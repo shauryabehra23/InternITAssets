@@ -10,6 +10,23 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/postgres?schema=public"
+      SESSION_SECRET: "${SESSION_SECRET}"
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   pgdata:
