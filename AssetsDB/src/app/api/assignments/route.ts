@@ -48,7 +48,9 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "Invalid JSON", code: "VALIDATION_ERROR" }, { status: 400 });
   }
 
-  const { assetId, userId, notes } = body;
+  const assetId = Number(body.assetId);
+  const userId = Number(body.userId);
+  const { notes } = body;
 
   // 1. Auth check already done by requireUser
   if (!assetId || !userId) {
