@@ -99,6 +99,9 @@ export async function PUT(
   }
 
   const data = sanitizeAssetBody(body);
+  for (const k of ["companyCode", "vendorCode", "locationId", "assetClassCode"]) {
+    if (data[k] !== undefined && data[k] !== null && data[k] !== "") data[k] = Number(data[k]);
+  }
   const validationError = validateAssetData(data);
   if (validationError) {
     return Response.json({ error: validationError, code: "VALIDATION_ERROR" }, { status: 400 });
