@@ -46,6 +46,7 @@ export default function AssetDetail() {
       push("success", "Asset assigned");
       setAssignOpen(false); setAssignUser(""); setAssignNotes("");
       load();
+      router.refresh();
     } catch (e: any) {
       push("error", e.status === 409 ? "Asset is already assigned, return it first" : e.message);
     } finally { setBusy(false); }
@@ -57,6 +58,7 @@ export default function AssetDetail() {
       await api(`/api/assignments/${activeAssignment.assignmentId}/return`, { method: "PATCH" });
       push("success", "Asset returned");
       setReturnOpen(false); load();
+      router.refresh();
     } catch (e: any) { push("error", e.message); }
     finally { setBusy(false); }
   };
